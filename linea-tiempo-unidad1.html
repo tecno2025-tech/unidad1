@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La configuración del sistema educativo argentino — Línea de tiempo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f5fb;
+    --surface:#ffffff;
+    --ink:#181425;
+    --ink-soft:#5c5773;
+    --ink-faint:#8b87a0;
+
+    --politico:#3454d1;
+    --politico-tint:#e8ecfd;
+    --gobierno:#c81e6b;
+    --gobierno-tint:#fbe4ee;
+    --pedagogico:#059669;
+    --pedagogico-tint:#e0f5ee;
+    --legal:#c2760a;
+    --legal-tint:#fbedd9;
+
+    --track:#dfe1f0;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    margin:0;
+    padding:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Manrope', sans-serif;
+    min-height:100vh;
+  }
+
+  body{
+    background-image:
+      radial-gradient(circle at 8% 0%, rgba(67,97,238,0.10), transparent 38%),
+      radial-gradient(circle at 95% 12%, rgba(247,37,133,0.08), transparent 40%),
+      radial-gradient(circle at 50% 100%, rgba(0,184,148,0.08), transparent 45%);
+    background-attachment:fixed;
+  }
+
+  .wrap{
+    max-width:1120px;
+    margin:0 auto;
+    padding:52px 24px 90px;
+  }
+
+  header{
+    text-align:center;
+    margin-bottom:36px;
+  }
+
+  .eyebrow{
+    display:inline-block;
+    font-family:'Manrope', sans-serif;
+    font-weight:700;
+    font-size:12.5px;
+    letter-spacing:0.03em;
+    color:var(--politico);
+    background:var(--politico-tint);
+    padding:6px 14px;
+    border-radius:20px;
+    margin:0 0 18px;
+  }
+
+  h1{
+    font-family:'Sora', sans-serif;
+    font-weight:800;
+    font-size:clamp(32px, 5vw, 48px);
+    line-height:1.12;
+    margin:0 0 14px;
+    color:var(--ink);
+  }
+
+  .subtitle{
+    font-size:16px;
+    color:var(--ink-soft);
+    max-width:560px;
+    margin:0 auto;
+    line-height:1.6;
+  }
+
+  /* legend */
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:10px;
+    margin:28px 0 6px;
+  }
+  .legend-item{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-size:13px;
+    font-weight:600;
+    padding:7px 14px;
+    border-radius:20px;
+  }
+  .legend-item.politico{ color:var(--politico); background:var(--politico-tint); }
+  .legend-item.gobierno{ color:var(--gobierno); background:var(--gobierno-tint); }
+  .legend-item.pedagogico{ color:var(--pedagogico); background:var(--pedagogico-tint); }
+  .legend-item.legal{ color:var(--legal); background:var(--legal-tint); }
+  .legend-dot{ width:8px; height:8px; border-radius:50%; background:currentColor; display:inline-block; }
+
+  /* timeline */
+  .timeline-scroll{
+    margin-top:54px;
+    overflow-x:auto;
+    padding:14px 4px 22px;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .timeline{
+    position:relative;
+    display:flex;
+    align-items:stretch;
+    gap:16px;
+    min-width:1080px;
+    padding:0 8px;
+  }
+
+  .timeline::before{
+    content:"";
+    position:absolute;
+    left:8px; right:8px; top:34px;
+    height:4px;
+    border-radius:4px;
+    background:linear-gradient(to right,
+      var(--politico) 0 11%,
+      var(--pedagogico) 11% 22%,
+      var(--legal) 22% 33%,
+      var(--politico) 33% 44%,
+      var(--gobierno) 44% 55%,
+      var(--pedagogico) 55% 66%,
+      var(--politico) 66% 77%,
+      var(--legal) 77% 88%,
+      var(--legal) 88% 100%
+    );
+    opacity:0.55;
+  }
+
+  .node{
+    position:relative;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    cursor:pointer;
+    background:none;
+    border:none;
+    font-family:inherit;
+    color:inherit;
+    padding:0;
+  }
+
+  .node-dot{
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    background:var(--surface);
+    border:4px solid var(--politico);
+    box-shadow:0 4px 14px rgba(24,20,37,0.12);
+    margin-top:18px;
+    transition:transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  .node[data-cat="politico"] .node-dot{ border-color:var(--politico); }
+  .node[data-cat="legal"] .node-dot{ border-color:var(--legal); }
+  .node[data-cat="pedagogico"] .node-dot{ border-color:var(--pedagogico); }
+  .node[data-cat="gobierno"] .node-dot{ border-color:var(--gobierno); }
+
+  .node:hover .node-dot,
+  .node:focus-visible .node-dot{
+    transform:scale(1.18) translateY(-2px);
+    box-shadow:0 8px 20px rgba(24,20,37,0.2);
+  }
+
+  .node.visited .node-dot{ background:currentColor; }
+  .node[data-cat="politico"].visited .node-dot{ color:var(--politico); }
+  .node[data-cat="legal"].visited .node-dot{ color:var(--legal); }
+  .node[data-cat="pedagogico"].visited .node-dot{ color:var(--pedagogico); }
+  .node[data-cat="gobierno"].visited .node-dot{ color:var(--gobierno); }
+
+  .node-check{
+    position:absolute;
+    top:14px;
+    font-size:14px;
+    color:#fff;
+    font-weight:700;
+    opacity:0;
+    pointer-events:none;
+  }
+  .node.visited .node-check{ opacity:1; }
+
+  .node-year{
+    font-family:'Sora', sans-serif;
+    font-size:17px;
+    font-weight:700;
+    margin-top:14px;
+    color:var(--ink);
+  }
+
+  .node-title{
+    font-size:12.5px;
+    font-weight:500;
+    color:var(--ink-soft);
+    max-width:126px;
+    line-height:1.4;
+    margin-top:5px;
+  }
+
+  .node:focus-visible{
+    outline:2px solid var(--politico);
+    outline-offset:6px;
+    border-radius:12px;
+  }
+
+  footer.hint{
+    text-align:center;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--ink-faint);
+    margin-top:6px;
+  }
+
+  /* overlay + card */
+  .overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(24,20,37,0.45);
+    backdrop-filter:blur(2px);
+    display:none;
+    align-items:flex-start;
+    justify-content:center;
+    padding:36px 16px;
+    overflow-y:auto;
+    z-index:50;
+  }
+  .overlay.open{ display:flex; }
+
+  .card{
+    background:var(--surface);
+    color:var(--ink);
+    max-width:660px;
+    width:100%;
+    border-radius:24px;
+    box-shadow:0 30px 70px rgba(24,20,37,0.35);
+    overflow:hidden;
+    animation:card-in 0.22s ease;
+  }
+  @keyframes card-in{
+    from{ opacity:0; transform:translateY(14px) scale(0.97); }
+    to{ opacity:1; transform:translateY(0) scale(1); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .card{ animation:none; }
+  }
+
+  .card-head{
+    padding:26px 32px 22px;
+    color:#fff;
+  }
+  .card-head.politico{ background:linear-gradient(135deg, var(--politico), #5c76e0); }
+  .card-head.gobierno{ background:linear-gradient(135deg, var(--gobierno), #e0538e); }
+  .card-head.pedagogico{ background:linear-gradient(135deg, var(--pedagogico), #2fb583); }
+  .card-head.legal{ background:linear-gradient(135deg, var(--legal), #dd9a3d); }
+
+  .card-topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:16px;
+  }
+
+  .btn-home{
+    font-family:'Manrope', sans-serif;
+    font-size:13px;
+    font-weight:700;
+    background:rgba(255,255,255,0.22);
+    color:#fff;
+    border:none;
+    padding:9px 16px;
+    border-radius:20px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+  }
+  .btn-home:hover{ background:rgba(255,255,255,0.34); }
+  .btn-home:focus-visible{ outline:2px solid #fff; outline-offset:2px; }
+
+  .card-tag{
+    font-family:'Manrope', sans-serif;
+    font-size:12px;
+    font-weight:700;
+    padding:6px 13px;
+    border-radius:20px;
+    background:rgba(255,255,255,0.24);
+    color:#fff;
+  }
+
+  .card-year{
+    font-family:'Sora', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    opacity:0.9;
+    margin:0 0 4px;
+  }
+
+  .card-head h2{
+    font-family:'Sora', sans-serif;
+    font-size:25px;
+    font-weight:800;
+    line-height:1.28;
+    margin:0;
+  }
+
+  .card-body{
+    padding:28px 32px 34px;
+  }
+
+  .card-body h4{
+    font-family:'Sora', sans-serif;
+    font-size:14px;
+    font-weight:700;
+    margin:24px 0 8px;
+  }
+  .card-body.politico h4{ color:var(--politico); }
+  .card-body.gobierno h4{ color:var(--gobierno); }
+  .card-body.pedagogico h4{ color:var(--pedagogico); }
+  .card-body.legal h4{ color:var(--legal); }
+
+  .card-body p{
+    font-size:15.5px;
+    line-height:1.7;
+    margin:0 0 13px;
+    color:var(--ink);
+  }
+  .card-body p:first-child{ margin-top:0; }
+
+  .card-body ul{
+    margin:0 0 13px;
+    padding-left:20px;
+  }
+  .card-body li{
+    font-size:15.5px;
+    line-height:1.65;
+    margin-bottom:8px;
+  }
+
+  .card-body .stream{
+    border-radius:14px;
+    padding:12px 16px;
+    margin-bottom:10px;
+  }
+  .card-body.pedagogico .stream{ background:var(--pedagogico-tint); }
+  .card-body .stream strong{ display:block; margin-bottom:2px; font-size:14.5px; }
+
+  .think-box{
+    border-radius:16px;
+    padding:16px 18px;
+    margin:14px 0;
+  }
+  .card-body.pedagogico .think-box{ background:var(--pedagogico-tint); border:1px solid rgba(0,184,148,0.25); }
+  .card-body.politico .think-box{ background:var(--politico-tint); border:1px solid rgba(67,97,238,0.25); }
+  .think-box p{ margin:0 0 8px; font-size:15px; }
+  .think-box p:last-child{ margin-bottom:0; }
+  .think-title{
+    font-family:'Sora', sans-serif;
+    font-weight:700;
+    font-size:13px;
+    margin-bottom:8px;
+    display:block;
+  }
+  .card-body.pedagogico .think-title{ color:var(--pedagogico); }
+  .card-body.politico .think-title{ color:var(--politico); }
+
+  .source-note{
+    font-size:13px;
+    font-style:italic;
+    color:var(--ink-faint);
+    margin-top:-4px;
+  }
+
+  .btn-home-bottom{
+    margin-top:24px;
+    font-size:13px;
+    font-weight:700;
+    border:none;
+    padding:11px 20px;
+    border-radius:20px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    color:#fff;
+  }
+  .card-body.politico .btn-home-bottom{ background:var(--politico); }
+  .card-body.gobierno .btn-home-bottom{ background:var(--gobierno); }
+  .card-body.pedagogico .btn-home-bottom{ background:var(--pedagogico); }
+  .card-body.legal .btn-home-bottom{ background:var(--legal); }
+  .btn-home-bottom:hover{ filter:brightness(1.08); }
+
+  @media (max-width:600px){
+    .card-head{ padding:22px 22px 18px; }
+    .card-body{ padding:22px 22px 28px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Historia de la Educación Argentina · Unidad 1</span>
+    <h1>La configuración del sistema educativo argentino</h1>
+    <p class="subtitle">Importante: esta línea de tiempo no reemplaza de ningún modo la lectura de la bibliografía obligatoria seleccionada. Solo recupera y ordena los principales hitos. Hacé clic en cada punto de la línea de tiempo para abrir la tarjeta con su contenido.</p>
+  </header>
+
+  <div class="legend">
+    <span class="legend-item politico"><span class="legend-dot"></span>Estado y proyecto de país</span>
+    <span class="legend-item gobierno"><span class="legend-dot"></span>Gobierno</span>
+    <span class="legend-item pedagogico"><span class="legend-dot"></span>Educación y pedagogía</span>
+    <span class="legend-item legal"><span class="legend-dot"></span>Normativa y leyes</span>
+  </div>
+
+  <div class="timeline-scroll">
+    <div class="timeline" id="timeline"></div>
+  </div>
+  <footer class="hint">Deslizá hacia los costados para ver toda la línea de tiempo →</footer>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="card" id="card" role="dialog" aria-modal="true" aria-labelledby="card-title">
+    <!-- filled by JS -->
+  </div>
+</div>
+
+<script>
+const CAT_LABEL = {
+  politico:"Estado y proyecto de país",
+  gobierno:"Gobierno",
+  pedagogico:"Educación y pedagogía",
+  legal:"Normativa y leyes"
+};
+
+const DATA = [
+  {
+    id:1, cat:"politico", year:"1810–1880",
+    title:"La formación del Estado Nacional",
+    body:`
+      <p>La unificación política del país fue un proceso largo y conflictivo: llevó casi siete décadas. Distintas fracciones dirigentes se disputaron dos grandes definiciones: qué régimen político tendría el Estado y qué modelo económico adoptaría.</p>
+      <p>Varios proyectos de país rivalizaron entre sí a lo largo de este período. Recién entre 1862 y 1880 uno de ellos logra imponerse —combinando consenso y coerción— y se avanza en la organización definitiva del Estado Nacional.</p>
+      <p>Ese proyecto vencedor representaba los intereses de una minoría vinculada a la tenencia de la tierra, la explotación agrícola-ganadera y su comercialización con el exterior.</p>
+    `
+  },
+  {
+    id:2, cat:"pedagogico", year:"1848",
+    title:"Sarmiento y su proyecto de Educación Popular",
+    body:`
+      <p>Sarmiento propuso la creación de un sistema de instrucción pública, al que llamó indistintamente <em>educación popular</em>, <em>educación común</em> o <em>instrucción pública</em>.</p>
+      <p>Su propuesta iba mucho más allá de la escuela primaria: incluía Cunas Públicas (0 a 2 años), Salas de Asilo (3 a 5 años), escuelas primarias, instituciones de educación secundaria (Colegios Nacionales, Escuelas Industriales, Escuelas de Comercio) y Escuelas Normales para formar a los propios docentes.</p>
+      <p>Para Sarmiento, la educación era la <em>palanca</em> para poner en marcha al Estado Nacional, y ponía especial énfasis en la formación del ciudadano.</p>
+      <p>Esta propuesta no era la única en juego: rivalizó con posturas que consideraban innecesaria —o directamente peligrosa— la educación de las mayorías, y con quienes se oponían a la educación de las mujeres.</p>
+      <p>Su proyecto educativo estuvo atravesado fuertemente por la dicotomía civilización y barbarie, lo que marcó el límite de "utopía democratizadora".</p>
+      <div class="think-box">
+        <span class="think-title">Para pensar</span>
+        <p>¿Cuál es el alcance de «lo popular» en Sarmiento? ¿qué sujetos populares quedarán excluidos de su proyecto? ¿Cómo opera la tensión inclusión/exclusión educativa en su propuesta? ¿y la tensión homogeneidad/diversidad cultural? ¿qué problemas plantea en torno a la "educabilidad"? ¿cómo opera la tensión democracia/autoritarismo en su proyecto educativo?</p>
+      </div>
+      <p class="source-note">Ver: Lección 5, Arata y Mariño, y Adamovsky.</p>
+    `
+  },
+  {
+    id:3, cat:"legal", year:"1853",
+    title:"Sanción de la Constitución Nacional",
+    body:`
+      <p>La Constitución estableció el reparto de competencias en materia educativa entre los distintos niveles de gobierno:</p>
+      <ul>
+        <li>Las <strong>provincias</strong> conservaron autonomía sobre la educación primaria en su territorio. Estableció que la educación primaria era un deber y un derecho de las provincias.</li>
+        <li>El <strong>Estado Nacional</strong> se reservó los planes de instrucción general y universitaria.</li>
+        <li>Consagró el derecho a la educación y la libertad de enseñanza.</li>
+      </ul>
+      <h4>Su efecto más duradero</h4>
+      <p>El conflicto sobre los alcances y límites de las autonomías provinciales frente al Estado Nacional, y las obligaciones y derechos de las provincias y la Nación, será un problema que atraviese toda la historia de la educación argentina hasta el presente.</p>
+      <p class="source-note">Ver Arata y Mariño, Lección 7.</p>
+    `
+  },
+  {
+    id:4, cat:"politico", year:"1862–1880",
+    title:"La Organización Nacional",
+    body:`
+      <p>En este período se impone, mediante una combinación de consenso y coerción, el proyecto de país de una elite vinculada a la tierra y al comercio agroexportador. Se discutían entonces preguntas centrales:</p>
+      <ul>
+        <li>Cómo unificar el poder político y asentarlo en leyes.</li>
+        <li>Qué régimen de gobierno adoptar: se impuso uno de carácter oligárquico.</li>
+        <li>Qué modelo económico seguir: agroexportador e importador de productos industrializados.</li>
+        <li>Cómo resolver la provisión de mano de obra, extranjera y nativa, y el problema del mercado interno.</li>
+      </ul>
+      <p>El período estuvo atravesado por el genocidio indígena, la idea de europeización y la dicotomía civilización y barbarie, que también definía qué papel debía cumplir la educación para las elites dirigentes.</p>
+      <p class="source-note">Ver Adamovsky.</p>
+    `
+  },
+  {
+    id:5, cat:"gobierno", year:"1868–1874",
+    title:"Presidencia de Sarmiento",
+    body:`
+      <p>Desde la presidencia, Sarmiento impulsa su proyecto educativo como política de Estado. Bajo su gestión comienza a tomar forma la infraestructura del sistema: se expande la creación de escuelas en distintos puntos del país e impulsa leyes de subvención a las provincias para que cumplan con su deber constitucional de brindar educación primaria.</p>
+      <p>Impulsa la creación de las primeras Escuelas Normales para la formación de maestros y maestras.</p>
+      <p>La educación se consolida como la herramienta elegida para construir ciudadanía y sostener al Estado Nacional en formación (con todas las implicancias que ello tiene en el pensamiento sarmientino).</p>
+      <p class="source-note">Ver Arata y Mariño, Lección 5.</p>
+    `
+  },
+  {
+    id:6, cat:"pedagogico", year:"1870",
+    title:"El surgimiento del Normalismo",
+    body:`
+      <p>A partir de 1871 se crean las Escuelas Normales Nacionales, con la finalidad de formar maestros y maestras. La primera fue la <strong>Escuela Normal de Paraná</strong>, que funcionó como modelo para las que se fundaron después.</p>
+      <p>El normalismo moldeó una pedagogía propia: un conjunto de ideas y prácticas modernas sobre qué es y cómo debe practicarse la educación. Respondía a la necesidad de formar un cuerpo de agentes estatales homogéneos, que sirvieran de puente entre el proyecto de la elite dirigente y las masas populares. Fue, en ese sentido, el brazo ideológico de la clase dirigente para instalar y naturalizar un orden político conservador: <em>normalización de los docentes para la normalización de la sociedad</em>.</p>
+
+      <h4>La hipótesis de Arata y Mariño</h4>
+      <p>El normalismo se vio potenciado por un Estado que impulsaba la educación como parte de su estrategia para construir un nuevo orden social. Los maestros ocuparon una posición subordinada —el diseño político y pedagógico quedó en manos de la elite intelectual y dirigente—, pero fueron ellos, como agentes estatales, quienes codificaron, ordenaron y moldearon las instituciones escolares y a sus sujetos, con una pedagogía entendida como herramienta de civilización.</p>
+
+      <h4>Distintas corrientes dentro del normalismo (Adriana Puiggrós)</h4>
+      <p>La Escuela Normal de Paraná no transmitió una ideología pedagógica homogénea. Dentro del normalismo convivieron proyectos político-pedagógicos en disputa:</p>
+      <div class="stream"><strong>Normalizador laico</strong> — Corriente predominante. Seguidores acríticos de Sarmiento, se creían "apóstoles del saber" llamados a civilizar. Vínculo docente-alumno verticalista y autoritario, influido por el higienismo.</div>
+      <div class="stream"><strong>Democrático-radicalizado</strong> — Crítico de la pedagogía autoritaria. Impulsaba la participación de la comunidad educativa, un vínculo pedagógico más igualitario y el respeto a los inmigrantes sin imposición cultural.</div>
+      <div class="stream"><strong>Socialista</strong> — Emparentado con el movimiento obrero y la inmigración europea. Defendía una educación popular democrática, atenta a trabajadores, mujeres y niños.</div>
+      <div class="stream"><strong>Anarquista o libertario</strong> — Antiestatista; promovía escuelas ligadas a organizaciones mutualistas y obreras. Fue perseguido tras la Ley de Residencia (1902) y la Ley de Seguridad Social (1910).</div>
+      <div class="stream"><strong>Normalizador católico</strong> — Cuestionaba la hegemonía estatal en educación y defendía la libertad de enseñanza y la enseñanza religiosa en las escuelas públicas.</div>
+
+      <h4>Una fuerte dinámica de género</h4>
+      <p>La docencia se construyó como un "apostolado" laico de entrega y vocación, expuesto al juicio social permanente, con escasa autonomía profesional. Fue también pensada como un trabajo "conveniente" para las mujeres, a mitad de camino entre el mandato patriarcal de las inclinaciones "naturales y maternales" y su incorporación al mercado laboral como mano de obra barata.</p>
+      <p>Para Sarmiento, el magisterio también constituía una oportunidad para que las mujeres se incorporaran como profesionales a la vida activa del país, abriéndoles las puertas a las mujeres para salir del sometimiento del hogar al que estaban relegadas.</p>
+      <p class="source-note">Ver Puiggrós.</p>
+    `
+  },
+  {
+    id:7, cat:"politico", year:"1880",
+    title:"Consolidación del Estado Liberal Oligárquico",
+    body:`
+      <p>Hacia 1880 ya existe un Estado Nacional consolidado, y con él un proyecto educativo nacional en marcha: se crean escuelas en distintos puntos del país y se forman docentes en las Escuelas Normales que venían fundándose desde 1870.</p>
+      <p>Para institucionalizar definitivamente ese proyecto estatal de educación, era necesario darle fuerza de ley. Este momento es la antesala directa de la Ley 1420.</p>
+      <p class="source-note">Ver Adamovsky.</p>
+    `
+  },
+  {
+    id:8, cat:"legal", year:"1884",
+    title:"Sanción de la Ley 1420",
+    body:`
+      <p>Estableció la educación común, obligatoria, gratuita, gradual, a cargo del Estado y preferentemente mixta. La enseñanza religiosa solo podía ser impartida por ministros autorizados de cada culto, antes o después del horario de clase.</p>
+
+      <h4>Contenidos obligatorios</h4>
+      <p>Lectura y escritura, aritmética, geografía e historia (particular de la República y nociones generales), idioma nacional, moral y urbanidad, nociones de higiene, de ciencias matemáticas, físicas y naturales, dibujo y música vocal, gimnástica y conocimiento de la Constitución Nacional. Para las niñas se sumaban labores de manos y economía doméstica; para los varones, ejercicios militares sencillos y, en la campaña, nociones de agricultura y ganadería.</p>
+
+      <h4>Otras instituciones que crea</h4>
+      <ul>
+        <li>Jardines de Infantes en las ciudades.</li>
+        <li>Escuelas para adultos en cuarteles, cárceles, fábricas y otros establecimientos.</li>
+        <li>Escuelas ambulantes en zonas de población dispersa.</li>
+        <li>Inspección técnica y administrativa de las escuelas.</li>
+        <li>Un Tesoro común de las escuelas (fondo escolar permanente).</li>
+      </ul>
+      <p>Exigía además título de Escuela Normal para ejercer la docencia, y sometía a las escuelas particulares a la supervisión estatal y a sus contenidos obligatorios.</p>
+
+      <h4>Un límite territorial importante</h4>
+      <p>La ley solo regía en la Capital Federal y los Territorios y Colonias Nacionales, no en las provincias. Sin embargo, estas dictaron leyes propias de educación primaria muy similares, por lo que en la práctica gran parte del país terminó rigiéndose por los mismos principios.</p>
+      <p class="source-note">Ver Arata y Mariño, Lección 7.</p>
+    `
+  },
+  {
+    id:9, cat:"legal", year:"1905",
+    title:"Sanción de la Ley Láinez",
+    body:`
+      <p>Autorizó a la Nación a crear escuelas nacionales en aquellas provincias que lo solicitaran. Estas escuelas eran elementales, infantiles, mixtas y rurales, y debían impartir como mínimo los contenidos establecidos por la Ley 1420.</p>
+      <h4>Su efecto en el sistema</h4>
+      <p>Significó una presencia mucho más fuerte del Estado Nacional en la educación primaria dentro de las provincias, y reforzó la tendencia hacia la homogeneización y la centralización de la educación en todo el país.</p>
+      <p class="source-note">Ver Arata y Mariño, Lección 7.</p>
+    `
+  }
+];
+
+const timeline = document.getElementById('timeline');
+const overlay = document.getElementById('overlay');
+const card = document.getElementById('card');
+let lastFocused = null;
+
+DATA.forEach(item => {
+  const node = document.createElement('button');
+  node.className = 'node';
+  node.type = 'button';
+  node.dataset.cat = item.cat;
+  node.dataset.id = item.id;
+  node.setAttribute('aria-haspopup','dialog');
+  node.innerHTML = `
+    <span class="node-dot"><span class="node-check">✓</span></span>
+    <span class="node-year">${item.year}</span>
+    <span class="node-title">${item.title}</span>
+  `;
+  node.addEventListener('click', () => openCard(item, node));
+  timeline.appendChild(node);
+});
+
+function openCard(item, node){
+  lastFocused = document.activeElement;
+  card.innerHTML = `
+    <div class="card-head ${item.cat}">
+      <div class="card-topbar">
+        <button class="btn-home" id="btnHomeTop">↺ Volver al inicio</button>
+        <span class="card-tag">${CAT_LABEL[item.cat]}</span>
+      </div>
+      <p class="card-year">${item.year}</p>
+      <h2 id="card-title">${item.title}</h2>
+    </div>
+    <div class="card-body ${item.cat}">
+      ${item.body}
+      <button class="btn-home-bottom" id="btnHomeBottom">↺ Volver al inicio</button>
+    </div>
+  `;
+  overlay.classList.add('open');
+  overlay.scrollTop = 0;
+  node.classList.add('visited');
+
+  document.getElementById('btnHomeTop').addEventListener('click', closeCard);
+  document.getElementById('btnHomeBottom').addEventListener('click', closeCard);
+  document.getElementById('btnHomeTop').focus();
+}
+
+function closeCard(){
+  overlay.classList.remove('open');
+  if(lastFocused) lastFocused.focus();
+}
+
+overlay.addEventListener('click', (e) => {
+  if(e.target === overlay) closeCard();
+});
+
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape' && overlay.classList.contains('open')) closeCard();
+});
+</script>
+
+</body>
+</html>
